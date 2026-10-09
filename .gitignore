@@ -22,3 +22,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Full narration exceeds the 100 MB GitHub file limit; rebuild by concatenating audio/parts/
+audio/Returned_full_narration.mp3
