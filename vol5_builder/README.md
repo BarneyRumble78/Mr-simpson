@@ -15,11 +15,11 @@ Video 1 also has the opening note + Proem; video 12 also has the Coda before its
 
 - Download the Drive folder **Minerva's Ark / Vol 5 the veteran - polished ASMR** (all 15 `.mp3`,
   the 12 `... - usesuno.com.zip`, the `P*.jpg` stills). Do not use the older "Vol 5 the veteran" folder.
-- Have the two PDFs (`The_Long_Return.pdf`, `Two_Worlds_One_Life.pdf`) in one folder.
+- The two PDFs (`The_Long_Return.pdf`, `Two_Worlds_One_Life.pdf`) are already in this repo at `vol5_builder/pdfs/` - use `--pdfs ./pdfs`.
 
 ## 3. Arrange them
 
-    python3 prep.py --drive ~/Downloads/"Vol 5 the veteran - polished ASMR" --pdfs ~/Downloads
+    python3 prep.py --drive ~/Downloads/"Vol 5 the veteran - polished ASMR" --pdfs ./pdfs
 
 It should print: 15 narration tracks, 12 songs, 35 painted stills, 30 documentary photos.
 If a count is wrong, stop and fix that before building.

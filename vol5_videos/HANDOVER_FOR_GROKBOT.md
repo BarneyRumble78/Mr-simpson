@@ -9,12 +9,12 @@
 
 ## Inputs the user must have on the Mac
 - Drive folder **Minerva's Ark / Vol 5 the veteran - polished ASMR**: 15 narration `.mp3` (00 opening note, 01 Proem, 02-13 chapters One-Twelve, 14 Coda), 12 Suno `*.zip` songs (each has .m4a, .jpeg cover, .txt lyrics), `P*.jpg` painted stills. Do NOT use the older folder "Vol 5 the veteran" (unpolished audio).
-- Two PDFs of documentary photos: `The_Long_Return.pdf`, `Two_Worlds_One_Life.pdf` (15 pages each).
+- Two PDFs of documentary photos (15 pages each): already in the repo at `vol5_builder/pdfs/` - use `--pdfs ./pdfs`.
 - `brew install ffmpeg poppler` (the user already started this).
 
 ## Steps
 1. `git clone --branch ccr-ceddc1af-04hh6f --single-branch https://github.com/BarneyRumble78/Mr-simpson.git && cd Mr-simpson/vol5_builder`
-2. `python3 prep.py --drive <Drive folder> --pdfs <folder with the PDFs>`
+2. `python3 prep.py --drive <Drive folder> --pdfs ./pdfs`
    Must report: 15 narration tracks, 12 songs, 35 painted stills, 30 documentary photos. If a count is off, STOP and tell the user which files are missing; do not guess or substitute.
 3. Test one video: `python3 build.py all 2`. Report how long it took and check a frame from the song section (cover art bottom-left, song title readable). Compare the file length with `YouTube_metadata.txt` (video 2 should be about 14:13).
 4. If good: `python3 build.py all` (resumable; re-run the same command if interrupted). Report percentage progress after each video.
