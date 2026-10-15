@@ -1,60 +1,34 @@
-# Handover: fetch the Minerva's Ark Vol. 5 videos
+# Handover: build the Minerva's Ark Vol. 5 videos on the user's Mac
 
-**Task:** download the finished videos from this GitHub repo branch to the user's Mac desktop, join the parts, and check them.
+**Goal:** make 12 YouTube-ready chapter videos (1080p) from the user's Drive files, each ending with its song, and put them on the user's Desktop. Everything runs locally; do not upload anything anywhere.
 
-- Repo: `BarneyRumble78/Mr-simpson` (https://github.com/BarneyRumble78/Mr-simpson)
-- Branch: `ccr-ceddc1af-04hh6f`
-- Folder: `vol5_videos/`
-- If the repo is private, the user must give you access first (they are signed in on their Mac; `gh auth login` or an existing git credential is fine). Do not ask for or store tokens in files.
+## Where things are
+- Repo: `BarneyRumble78/Mr-simpson`, branch `ccr-ceddc1af-04hh6f` (needs the user's GitHub login if private; never write tokens to files).
+- Builder + instructions: `vol5_builder/` (`README.md`, `prep.py`, `build.py`, `YouTube_metadata.txt`).
+- Video 1 already rendered at 720p, split in 3 parts in `vol5_videos/` (`JOIN_PARTS.md` explains joining). Videos 2-12 are not built; they come from the Mac run. A cloud render was stopped, nothing else is pending there.
 
-## What is in the folder
-12 videos, one per chapter, 1280x720, 24 fps, H.264 + AAC. Each ends with the chapter's song.
-GitHub caps files at 100 MB, so each video is split into `..._part1.mp4`, `..._part2.mp4`, ...
-(each part plays on its own). Videos are pushed one at a time as they finish rendering, so
-some may not be there yet; check the folder listing and the last commit message before you start.
-
-| # | Name stem | Contents |
-|---|-----------|----------|
-| 01 | `Minervas_Ark_Vol5_01_The_Watch` | Opening note, Proem, Ch. One, song "The Door" |
-| 02 | `Minervas_Ark_Vol5_02_The_Threshold` | Ch. Two, song "The Unmarked Line" |
-| 03 | `Minervas_Ark_Vol5_03_The_One_and_the_Many` | Ch. Three, song "Gone Quiet" |
-| 04 | `Minervas_Ark_Vol5_04_The_Glass` | Ch. Four, song "Third Sheep from the Left" |
-| 05 | `Minervas_Ark_Vol5_05_The_Hour_That_Will_Not_Pass` | Ch. Five, song "Smoke Over the Fence" |
-| 06 | `Minervas_Ark_Vol5_06_Every_Perspective_at_Once` | Ch. Six, song "Still Awake" |
-| 07 | `Minervas_Ark_Vol5_07_The_Next_One` | Ch. Seven, song "One More" |
-| 08 | `Minervas_Ark_Vol5_08_The_Grey` | Ch. Eight, song "Come On, Then" |
-| 09 | `Minervas_Ark_Vol5_09_The_Bed_in_the_Olive_Tree` | Ch. Nine, song "It Wasn't You" |
-| 10 | `Minervas_Ark_Vol5_10_The_Devouring_Face` | Ch. Ten, song "Till It's Light" |
-| 11 | `Minervas_Ark_Vol5_11_Death_of_the_Self` | Ch. Eleven, song "Just Tonight" |
-| 12 | `Minervas_Ark_Vol5_12_Reveille` | Ch. Twelve, Coda, song "Aisle Four" |
-
-Also in the folder (once the run finishes): `YouTube_metadata.txt` (titles, descriptions, chapter
-timestamps, tags) and `NN_*.jpg` thumbnails (1280x720).
+## Inputs the user must have on the Mac
+- Drive folder **Minerva's Ark / Vol 5 the veteran - polished ASMR**: 15 narration `.mp3` (00 opening note, 01 Proem, 02-13 chapters One-Twelve, 14 Coda), 12 Suno `*.zip` songs (each has .m4a, .jpeg cover, .txt lyrics), `P*.jpg` painted stills. Do NOT use the older folder "Vol 5 the veteran" (unpolished audio).
+- Two PDFs of documentary photos: `The_Long_Return.pdf`, `Two_Worlds_One_Life.pdf` (15 pages each).
+- `brew install ffmpeg poppler` (the user already started this).
 
 ## Steps
-1. Get the files (needs `git` and `ffmpeg`; `brew install ffmpeg` if missing):
+1. `git clone --branch ccr-ceddc1af-04hh6f --single-branch https://github.com/BarneyRumble78/Mr-simpson.git && cd Mr-simpson/vol5_builder`
+2. `python3 prep.py --drive <Drive folder> --pdfs <folder with the PDFs>`
+   Must report: 15 narration tracks, 12 songs, 35 painted stills, 30 documentary photos. If a count is off, STOP and tell the user which files are missing; do not guess or substitute.
+3. Test one video: `python3 build.py all 2`. Report how long it took and check a frame from the song section (cover art bottom-left, song title readable). Compare the file length with `YouTube_metadata.txt` (video 2 should be about 14:13).
+4. If good: `python3 build.py all` (resumable; re-run the same command if interrupted). Report percentage progress after each video.
+   Options: `RES=720` for faster/smaller, `CRF=18` for higher quality, `SONG_DB=-3` song level vs narration.
+5. Outputs are in `work/out/Minervas_Ark_Vol5_NN_<Title>.mp4`. Copy them to `~/Desktop/Minervas_Ark_Vol5/` along with `YouTube_metadata.txt`. Keep `work/` until the user has watched them.
 
-       cd ~/Desktop
-       git clone --branch ccr-ceddc1af-04hh6f --single-branch --depth 1 https://github.com/BarneyRumble78/Mr-simpson.git minerva_tmp
-       cd minerva_tmp/vol5_videos && ls -la
+## What the videos should look like (check against this)
+- 0-7 s title card (Minerva's Ark / Vol. 5 The Veteran / Chapter name), then narration over slow Ken Burns moves on painted stills with crossfades.
+- Narration is untouched (~-20 LUFS); the song follows after a short gap, about 3 dB below the narration, with the cover art + song title for 12 s over documentary photos, then a long fade-out.
+- Video 1 also contains the opening note + Proem; video 12 has the Coda before its song.
+- Known gaps: P04a, P06a, P10a stills do not exist, so chapters 4, 6 and 10 reuse their other stills.
 
-2. Join the parts into one file per video (instant, no re-encode):
-
-       for v in $(ls *_part1.mp4 | sed 's/_part1.mp4//'); do
-         ls ${v}_part*.mp4 | sort -V | sed "s/^/file '/;s/\$/'/" > list.txt
-         ffmpeg -f concat -safe 0 -i list.txt -c copy ${v}.mp4
-       done
-       rm -f list.txt
-
-3. Move the joined videos, thumbnails and `YouTube_metadata.txt` to `~/Desktop/Minervas_Ark_Vol5/`.
-   Do not delete the `_partN` files until the checks below pass.
-
-4. Check each joined video:
-   - `ffprobe -v error -show_entries format=duration -of csv=p=0 FILE.mp4` should match the length in `YouTube_metadata.txt` (within 1 s).
-   - It opens and plays through the part joins with no jump or audio gap.
-   - If a video is missing parts, report which ones. Do not fabricate or re-render anything.
-
-## Notes
-- These are the user's own unreleased recordings: keep them local, do not upload anywhere other than the user's own YouTube channel when they ask you to.
-- To re-pull later videos: `git pull` inside the cloned folder, then repeat step 2.
-- The videos were rendered at 720p at the user's request (lower quality, to get them out sooner).
+## Rules
+- Don't re-record, change or replace the user's audio or art. Don't make up missing files.
+- Don't upload to YouTube or any host; the user will upload.
+- If something fails, report the exact error and what you tried; don't claim it worked without checking the output file plays and has the right length.
+- Keep status updates short, with percentages.
